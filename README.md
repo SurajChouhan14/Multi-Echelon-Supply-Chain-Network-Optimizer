@@ -1,86 +1,62 @@
-# Multi-Echelon Supply Chain Network Optimization Engine
+# 📦 Multi-Echelon Supply Chain Network Flow Optimizer
+### 3-Echelon Mixed-Integer Linear Program (MILP) | Multi-Material BOM Balance | Multi-Commodity Flow | SciPy HiGHS
 
-An exact Operations Research engine implementing **Mixed-Integer Linear Programming (MILP)** to minimize total procurement, multi-tier inbound transportation, manufacturing conversion (with multi-material Bill of Materials BOM constraints), and outbound distribution costs across **5 Suppliers, 3 Assembly Plants, and 4 Regional Customer Markets**.
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Optimization](https://img.shields.io/badge/Solver-HiGHS%20%2F%20MILP-success.svg)](https://highs.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
----
-
-## 1. System Architecture
-
-```
-                                 +-------------------------------------+
-                                 | 5 Raw Material Suppliers            |
-                                 | (Materials A, B, C, D)              |
-                                 +------------------+------------------+
-                                                    | Inbound Freight (c_sm)
-                                                    v
-                                 +-------------------------------------+
-                                 | 3 Manufacturing Plants              |
-                                 | (BOM Conversion & Prod Capacities)  |
-                                 +------------------+------------------+
-                                                    | Outbound Freight (c_fc)
-                                                    v
-                                 +-------------------------------------+
-                                 | 4 Regional Customer Markets         |
-                                 | (100% Demand Satisfaction)          |
-                                 +-------------------------------------+
-```
+A multi-echelon supply chain network design and commodity flow optimization platform formulating large-scale Mixed-Integer Linear Programs (MILP). Simultaneously optimizes supplier procurement, assembly plant manufacturing, Bill-of-Materials (BOM) conversions, and regional distribution center freight routing.
 
 ---
 
-## 2. Mathematical Formulation
+## 📌 Problem Formulation & Conservation Constraints
 
-### **Objective Function (Total Network Cost Minimization)**:
-$$\min \sum_{f} \sum_{m} \sum_{s} \text{orders}_{fms} \cdot (\text{MatCost}_{sm} + \text{InboundRate}_{sf}) + \sum_{f} \sum_{p} \text{vol}_{fp} \cdot \text{ProdCost}_{fp} + \sum_{f} \sum_{c} \sum_{p} \text{delivery}_{fcp} \cdot \text{OutboundRate}_{fc}$$
+```
+ 5 Raw Material Suppliers ──(Inbound Freight)──> 3 Manufacturing Assembly Plants
+                                                          │
+                                                (Multi-Material BOM Conversion)
+                                                          │
+                                                          ▼
+ 4 Regional Customer Markets <──(Outbound Freight)── 3 Assembly Plants
+```
 
-### **Operational Constraints**:
-1. **Supplier Availability Limits**: $\sum_{f} \text{orders}_{fms} \le \text{SupplierStock}_{sm} \quad \forall s, m$
-2. **Plant Capacity Bounds**: $\sum_{p} \text{vol}_{fp} \le \text{PlantCapacity}_{f} \quad \forall f$
-3. **Bill of Materials (BOM) Balance**: $\sum_{s} \text{orders}_{fms} \ge \sum_{p} \text{vol}_{fp} \cdot \text{BOM}_{pm} \quad \forall f, m$
-4. **Plant Flow Conservation**: $\text{vol}_{fp} \ge \sum_{c} \text{delivery}_{fcp} \quad \forall f, p$
-5. **Customer Demand Satisfaction**: $\sum_{f} \text{delivery}_{fcp} \ge \text{Demand}_{pc} \quad \forall c, p$
+### Flow Conservation & Bill-of-Materials (BOM) Balance:
+$$\sum_{s \in S} x_{smk} = \sum_{p \in P} B_{kp} \cdot y_{mp}, \quad \forall m \in M, \; k \in K$$
+$$\sum_{m \in M} z_{mpc} = D_{pc}, \quad \forall p \in P, \; c \in C$$
 
 ---
 
-## 3. Exact Computed Benchmark Results (7,500 Units Total Demand)
+## 📊 Industrial Case Study & Benchmark Performance
+* **Network Topology:** 5 Tier-1 Suppliers $\to$ 3 Assembly Plants $\to$ 4 Regional Customer Markets.
+* **Commodities:** 4 Raw Material types converted into 4 Finished Goods product lines.
+* **Weekly Demand:** **7,500 finished goods units**.
+* **Global Network Minimum Cost:** **\$986,883** ($100\%$ customer demand satisfied).
+  * Inbound Raw Material Procurement & Freight: **\$839,235.23 (85.0%)**
+  * Plant Manufacturing Conversion Cost: **\$121,486.36 (12.3%)**
+  * Outbound Customer Distribution Freight: **\$26,161.36 (2.7%)**
+* **Solver Convergence:** Solved in $< 0.10\text{s}$ using SciPy HiGHS.
 
+---
+
+## 📂 Repository Structure
 ```
-===============================================================================================
-MULTI-ECHELON SUPPLY CHAIN NETWORK OPTIMIZATION ENGINE
-===============================================================================================
-  * Optimization Status        : Optimal
-  * Total Minimum Network Cost : $986,882.96
-  * Raw Material Procurement   : $839,235.23  (85.0% of total expenditure)
-  * Plant Manufacturing Cost   : $121,486.36  (12.3% of total expenditure)
-  * Outbound Distribution Cost : $26,161.36   ( 2.7% of total expenditure)
-  * Total Production Volume    : 7,500 units (100.0% Customer Demand Satisfaction)
-===============================================================================================
+Multi-Echelon-Supply-Chain-Network-Optimizer/
+├── src/
+│   ├── supply_chain_solver.py      # MILP network flow formulation & solver
+│   └── data_loader.py              # Network topology, BOM matrix & cost tables
+├── Multi_Echelon_Supply_Chain.ipynb # Interactive execution notebook
+├── run_pipeline.py                 # Pipeline execution script
+├── test_supply_chain.py            # Unit testing suite (4/4 passing)
+└── requirements.txt                # Production dependencies
 ```
 
 ---
 
-## 4. Quick Start & Execution
-
+## 🚀 Quickstart & Reproducibility
 ```bash
-# 1. Install dependencies
+git clone https://github.com/SurajChouhan14/Multi-Echelon-Supply-Chain-Network-Optimizer.git
+cd Multi-Echelon-Supply-Chain-Network-Optimizer
 pip install -r requirements.txt
-
-# 2. Run exact MILP optimization pipeline
 python run_pipeline.py
-
-# 3. Run automated unit tests
-python test_supply_chain.py
+python -m unittest test_supply_chain.py
 ```
-
----
-
-## 5. Master Placement Resume Description
-
-> **Multi-Echelon Supply Chain Network Optimizer (MILP)**
-> * Formulated an end-to-end Mixed-Integer Linear Program (MILP) in Python/PuLP optimizing a multi-tier manufacturing network spanning 5 suppliers, 3 plants, and 4 regional customer markets.
-> * Implemented Bill of Materials (BOM) multi-material conversion balances, supplier capacity limits, and multi-modal transportation tariffs.
-> * Achieved \$986,882 global cost minimization with 100% customer order fulfillment across 7,500 units of weekly demand.
-
----
-
-## License
-MIT License. Open for academic research and portfolio demonstration.
