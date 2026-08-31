@@ -1,8 +1,7 @@
 """
-Multi-Echelon Supply Chain Network Optimization Engine.
-
-Solves the multi-tier procurement, manufacturing, and distribution problem minimizing total cost:
-1. Raw Material Purchasing & Inbound Transportation Costs
+Multi-Echelon Supply Chain Network Linear Programming Optimizer.
+Formulates and solves a 3-Echelon multi-commodity flow optimization problem minimizing total network cost:
+1. Raw Material Purchasing & Inbound Transportation Tariffs
 2. Plant-Level Production Conversion Costs (with BOM requirements)
 3. Finished Goods Outbound Distribution Logistics Costs
 """
@@ -14,7 +13,7 @@ import numpy as np
 
 class SupplyChainOptimizer:
     """
-    Exact Mixed-Integer / Linear Programming Solver for Multi-Echelon Supply Chain Networks.
+    Exact Linear Programming Solver for Multi-Echelon Supply Chain Networks using PuLP with CBC solver.
     """
 
     def __init__(self, network_data):
@@ -36,13 +35,13 @@ class SupplyChainOptimizer:
 
     def solve_network(self):
         """
-        Builds and solves the exact supply chain network optimization model.
+        Builds and solves the exact supply chain network Linear Program (LP).
         Returns:
-            dict containing status, total cost breakdown, and operational decisions.
+            dict containing status, total cost breakdown, and operational flow volumes.
         """
         prob = pulp.LpProblem("Multi_Echelon_Supply_Chain_Optimization", pulp.LpMinimize)
 
-        # Decision Variables:
+        # Decision Variables (100% Continuous Flow Variables):
         # 1. orders[f, m, s]: Raw material m ordered by factory f from supplier s
         orders = pulp.LpVariable.dicts(
             "orders",
@@ -97,7 +96,6 @@ class SupplyChainOptimizer:
             )
 
         # Constraint 3: Bill of Materials (BOM) Raw Material Balance
-        # Total material m received at factory f >= total material m needed for all products made at f
         for f in self.factories:
             for m in self.materials:
                 prob += (
@@ -107,7 +105,6 @@ class SupplyChainOptimizer:
                 )
 
         # Constraint 4: Factory Flow Conservation
-        # Production of product p at factory f >= total shipments of product p from f to all customers
         for f in self.factories:
             for p in self.products:
                 prob += (
@@ -123,12 +120,24 @@ class SupplyChainOptimizer:
                     f"CustomerDemand_{c}_{p}"
                 )
 
-        # Solve using PuLP CBC Solver
+        # Solve using PuLP with CBC solver
         solver = pulp.PULP_CBC_CMD(msg=0)
         prob.solve(solver)
 
         status_str = pulp.LpStatus[prob.status]
-        total_cost = pulp.value(prob.objective) if prob.status == pulp.LpStatusOptimal or prob.status == 1 else 0.0
+        is_optimal = (prob.status == pulp.LpStatusOptimal or prob.status == 1)
+        total_cost = float(pulp.value(prob.objective)) if is_optimal else 0.0
+
+        if not is_optimal:
+            return {
+                "status": status_str,
+                "total_optimal_cost": 0.0,
+                "procurement_and_inbound_cost": 0.0,
+                "manufacturing_cost": 0.0,
+                "distribution_shipping_cost": 0.0,
+                "total_units_demanded": float(self.demand.values.sum()),
+                "total_units_produced": 0.0
+            }
 
         # Calculate cost breakdown
         procurement_cost = sum(
@@ -147,15 +156,17 @@ class SupplyChainOptimizer:
             if delivery[f, c, p].varValue is not None
         )
 
+        total_produced = sum(
+            production_volume[f, p].varValue for f in self.factories for p in self.products
+            if production_volume[f, p].varValue is not None
+        )
+
         return {
             "status": status_str,
-            "total_optimal_cost": round(float(total_cost), 2),
+            "total_optimal_cost": round(total_cost, 2),
             "procurement_and_inbound_cost": round(float(procurement_cost), 2),
             "manufacturing_cost": round(float(manufacturing_cost), 2),
             "distribution_shipping_cost": round(float(distribution_cost), 2),
             "total_units_demanded": float(self.demand.values.sum()),
-            "total_units_produced": sum(
-                production_volume[f, p].varValue for f in self.factories for p in self.products
-                if production_volume[f, p].varValue is not None
-            )
+            "total_units_produced": round(float(total_produced), 2)
         }

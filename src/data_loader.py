@@ -1,30 +1,27 @@
 """
-Multi-Echelon Supply Chain Data Ingestion & Calibration Module.
-Manages multi-tier supply chain network topologies:
+Multi-Echelon Supply Chain Network Topology & Parameters Ingestion Module.
+Defines a deterministic 3-Echelon multi-commodity network topology:
 - 5 Raw Material Suppliers
 - 3 Manufacturing Assembly Plants
 - 4 Regional Customer Markets
 - 4 Raw Material Categories & 4 Finished Product BOM Requirements
 """
 
-import os
 import pandas as pd
-import numpy as np
 
 
 class SupplyChainDataLoader:
     """
     Data generator and loader for Multi-Echelon Supply Chain Network Optimization.
+    Provides deterministic topological parameters and operational constraints.
     """
 
     def __init__(self, data_dir="data"):
         self.data_dir = data_dir
-        os.makedirs(self.data_dir, exist_ok=True)
-        self.excel_path = os.path.join(self.data_dir, "supply_chain_benchmark.xlsx")
 
     def load_network_data(self):
         """
-        Loads or creates the multi-echelon supply chain parameters:
+        Loads the deterministic multi-echelon supply chain parameters:
         1. Supplier stock & pricing
         2. Inbound/Outbound shipping tariffs
         3. Factory capacities & production costs
@@ -36,7 +33,7 @@ class SupplyChainDataLoader:
         products = ['Product A', 'Product B', 'Product C', 'Product D']
         customers = ['Customer A', 'Customer B', 'Customer C', 'Customer D']
 
-        # 1. Supplier Stock (Calibrated to support up to 10,000 units total throughput)
+        # 1. Supplier Stock (units)
         df_sup_stock = pd.DataFrame(
             [[4000, 4500, 3800, 5000],
              [5000, 3900, 4200, 3700],
@@ -56,7 +53,7 @@ class SupplyChainDataLoader:
             index=suppliers, columns=materials
         )
 
-        # 3. Inbound Raw Material Shipping ($/unit)
+        # 3. Inbound Raw Material Shipping Tariffs ($/unit)
         df_inbound_ship = pd.DataFrame(
             [[2.5, 3.0, 4.5],
              [3.0, 2.0, 3.5],
@@ -66,7 +63,7 @@ class SupplyChainDataLoader:
             index=suppliers, columns=factories
         )
 
-        # 4. Bill of Materials (Product requirements of materials)
+        # 4. Bill of Materials (BOM) Requirements
         df_bom = pd.DataFrame(
             [[2, 1, 1, 2],
              [1, 3, 2, 1],
@@ -75,13 +72,13 @@ class SupplyChainDataLoader:
             index=products, columns=materials
         )
 
-        # 5. Production Capacity (units)
+        # 5. Factory Production Capacity (units)
         df_prod_cap = pd.DataFrame(
             {'Capacity': [3000, 3500, 2800]},
             index=factories
         )
 
-        # 6. Production Cost ($/unit)
+        # 6. Factory Conversion / Production Cost ($/unit)
         df_prod_cost = pd.DataFrame(
             [[15.0, 18.0, 14.0, 20.0],
              [14.0, 17.0, 15.0, 19.0],
@@ -98,26 +95,13 @@ class SupplyChainDataLoader:
             index=products, columns=customers
         )
 
-        # 8. Outbound Shipping Costs ($/unit)
+        # 8. Outbound Finished Goods Shipping Tariffs ($/unit)
         df_outbound_ship = pd.DataFrame(
             [[3.5, 4.0, 5.0, 6.0],
              [5.0, 3.0, 4.5, 4.0],
              [6.0, 5.5, 3.0, 3.5]],
             index=factories, columns=customers
         )
-
-        try:
-            with pd.ExcelWriter(self.excel_path) as writer:
-                df_sup_stock.to_excel(writer, sheet_name="Supplier stock")
-                df_mat_cost.to_excel(writer, sheet_name="Raw material costs")
-                df_inbound_ship.to_excel(writer, sheet_name="Raw material shipping")
-                df_bom.to_excel(writer, sheet_name="Product requirements")
-                df_prod_cap.to_excel(writer, sheet_name="Production capacity")
-                df_prod_cost.to_excel(writer, sheet_name="Production cost")
-                df_demand.to_excel(writer, sheet_name="Customer demand")
-                df_outbound_ship.to_excel(writer, sheet_name="Shipping costs")
-        except Exception:
-            pass
 
         return {
             'suppliers': suppliers,
