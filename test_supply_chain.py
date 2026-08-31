@@ -2,7 +2,7 @@
 Automated Test Suite for Multi-Echelon Supply Chain Network Flow Optimizer.
 Tests:
 1. Topology & Demand Ingestion (7,500 demanded units across 4 products)
-2. Global Minimum Network Cost ($986,883 exact optimum)
+2. Global Minimum Network Cost ($986,883 exact optimum in SciPy HiGHS)
 3. 100% Demand Satisfaction & Flow Conservation
 4. Cost Component Additive Consistency (Procurement + Manufacturing + Distribution = Total)
 5. Constraint-Binding Sensitivity Probe & Infeasibility Threshold
@@ -20,7 +20,7 @@ from src.supply_chain_optimizer import SupplyChainOptimizer
 
 class TestMultiEchelonSupplyChain(unittest.TestCase):
     """
-    Hard unit tests for 3-Echelon multi-commodity Linear Program optimization.
+    Hard unit tests for 3-Echelon multi-commodity Linear Program optimization in SciPy HiGHS.
     """
 
     @classmethod
@@ -39,9 +39,9 @@ class TestMultiEchelonSupplyChain(unittest.TestCase):
         self.assertEqual(self.res['total_units_demanded'], 7500.0)
 
     def test_2_global_optimal_solution_and_cost(self):
-        """Verify solver reaches proven global optimum at $986,883 total network cost."""
-        self.assertEqual(self.res['status'], "Optimal")
-        self.assertAlmostEqual(self.res['total_optimal_cost'], 986882.96, delta=1.0)
+        """Verify solver reaches proven global optimum at $986,883 total network cost via SciPy HiGHS."""
+        self.assertIn("Optimal", self.res['status'])
+        self.assertAlmostEqual(self.res['total_optimal_cost'], 986882.95, delta=1.0)
 
     def test_3_demand_satisfaction_and_flow_balance(self):
         """Verify 100% customer demand satisfaction with 0.0 units shortfall."""

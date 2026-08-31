@@ -1,6 +1,6 @@
 """
 End-to-End Execution Pipeline for Multi-Echelon Supply Chain Network Optimization.
-Solves the deterministic 3-echelon procurement, BOM manufacturing, and customer distribution Linear Program.
+Solves the deterministic 3-echelon procurement, BOM manufacturing, and customer distribution Linear Program via SciPy HiGHS.
 """
 
 import os
@@ -30,7 +30,7 @@ def main():
     log("=" * 115)
     log("MULTI-ECHELON SUPPLY CHAIN NETWORK FLOW OPTIMIZATION PIPELINE")
     log("Benchmark: Deterministic 3-Echelon Multi-Commodity Supply Chain Network Flow")
-    log("Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality via PuLP with CBC solver")
+    log("Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality via SciPy HiGHS")
     log("=" * 115)
 
     log("\n[1/3] Loading supply chain network topology and operational parameters...")
@@ -42,7 +42,7 @@ def main():
     log(f"      • Materials & Finished Products     : {len(network_data['materials'])} Materials & {len(network_data['products'])} Finished Goods")
     log(f"      • Total Weekly Customer Demand      : {network_data['customer_demand'].values.sum():,.0f} units")
 
-    log("\n[2/3] Formulating and solving exact Linear Program (LP) in PuLP with CBC solver...")
+    log("\n[2/3] Formulating and solving exact Linear Program (LP) in SciPy HiGHS...")
     log("      -> Enforcing Supplier Inventory & Raw Material Allocation Limits")
     log("      -> Enforcing Bill of Materials (BOM) Component Conversion Balances")
     log("      -> Enforcing Plant Throughput Production Capacities")
@@ -54,7 +54,7 @@ def main():
     log("\n[3/3] Optimal Global Network Cost Breakdown & Operational Decisions:")
     log("=" * 115)
     log(f"  OPTIMIZATION CONVERGENCE:")
-    log(f"    - Solver Engine              : PuLP with CBC solver")
+    log(f"    - Solver Engine              : SciPy HiGHS (Dual-Simplex / Interior-Point)")
     log(f"    - Optimization Status        : {result['status']} (Proven Global Optimum — 0.0% Integrality Gap)")
     log(f"    - Total Minimum Network Cost : ${result['total_optimal_cost']:,.2f} (~$986,883.00)")
     log("")

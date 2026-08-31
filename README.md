@@ -1,6 +1,6 @@
 # Multi-Echelon Supply Chain Network Flow Optimizer
-> **Exact 3-Echelon Multi-Commodity Linear Program (LP) for Procurement, Plant Manufacturing, and Outbound Customer Distribution via PuLP with CBC solver**  
-> *Operations Research · Supply Chain Optimization · Linear Programming · Multi-Commodity Network Flow · PuLP / CBC · Cost Minimization*
+> **Exact 3-Echelon Multi-Commodity Linear Program (LP) for Procurement, Plant Manufacturing, and Outbound Customer Distribution via SciPy HiGHS**  
+> *Operations Research · Supply Chain Optimization · Linear Programming · Multi-Commodity Network Flow · SciPy HiGHS · Cost Minimization*
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![CI](https://github.com/SurajChouhan14/Multi-Echelon-Supply-Chain-Network-Optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/SurajChouhan14/Multi-Echelon-Supply-Chain-Network-Optimizer/actions)
@@ -12,7 +12,7 @@
 ## 🎯 Executive Overview & Architecture
 Global manufacturing enterprises face complex multi-echelon cost trade-offs across raw material procurement tariffs, plant-level manufacturing conversion costs, and outbound distribution logistics to customer demand markets.
 
-This repository implements a **Pure Linear Program (LP)** solving the 3-echelon multi-commodity supply chain network flow problem to **proven global optimality**:
+This repository implements a **Pure Linear Program (LP)** solving the 3-echelon multi-commodity supply chain network flow problem to **proven global optimality in SciPy HiGHS**:
 1. **Tier 1 (Procurement & Inbound Freight):** Optimizes raw material purchasing allocations across 5 global suppliers subject to individual material stock bounds.
 2. **Tier 2 (Manufacturing & BOM Balance):** Enforces plant throughput production capacities and multi-material Bill-of-Materials (BOM) component conversion equations.
 3. **Tier 3 (Outbound Customer Distribution):** Optimizes multi-commodity transportation flows across 4 regional customer demand markets to guarantee 100% on-time fulfillment at minimum total cost.
@@ -47,8 +47,8 @@ This repository implements a **Pure Linear Program (LP)** solving the 3-echelon 
 |---|:---:|:---:|---|
 | **Instance Provenance** | **$7,500	ext{ Units Demanded}$** | Synthetic 3-Echelon Topology | 5 suppliers, 3 assembly plants, 4 regional markets, 4 finished products, 4 raw materials |
 | **Formulation Class** | **Pure Linear Program (LP)** | $100\%$ Continuous Variables | $0.0\%$ integrality gap; solved to proven global optimality |
-| **Solver Engine** | **PuLP with CBC solver** | Primal-Dual Simplex | Verified global convergence in under 0.05 seconds |
-| **Global Minimized Cost** | **$\$986,882.96	ext{ (~}\$986,883	ext{)}$** | Exact LP Objective | Total minimum expenditure across procurement, manufacturing, and distribution |
+| **Solver Engine** | **SciPy HiGHS Solver** | Dual-Simplex / Interior-Point | Native SciPy HiGHS linear program solver (`linprog(method='highs')`) |
+| **Global Minimized Cost** | **$\$986,882.95	ext{ (~}\$986,883	ext{)}$** | Exact LP Objective | Total minimum expenditure across procurement, manufacturing, and distribution |
 | **Procurement & Inbound** | **$\$839,235.23	ext{ (}85.04\%	ext{)}$** | Purchasing + Shipping | Sourcing costs for all raw materials across 5 suppliers |
 | **Plant Manufacturing** | **$\$121,486.36	ext{ (}12.31\%	ext{)}$** | Conversion Cost Matrix | Assembly and production conversion costs across 3 manufacturing plants |
 | **Outbound Distribution** | **$\$26,161.36	ext{ (}2.65\%	ext{)}$** | Outbound Freight Tariffs | Logistics shipping costs delivering finished products to 4 customer markets |
@@ -67,8 +67,8 @@ Multi-Echelon-Supply-Chain-Network-Optimizer/
 │   └── final_benchmark.txt             # Frozen solver execution report
 ├── src/
 │   ├── data_loader.py                  # Network topology & parameter ingestion
-│   └── supply_chain_optimizer.py       # PuLP LP formulation & CBC solver engine
-├── requirements.txt                    # Dependencies (pulp, pandas, numpy)
+│   └── supply_chain_optimizer.py       # SciPy HiGHS LP formulation & solver engine
+├── requirements.txt                    # Dependencies (scipy, pandas, numpy)
 ├── run_pipeline.py                     # Pipeline execution & cost breakdown logger
 └── test_supply_chain.py                # 5 unit, sensitivity & infeasibility tests
 ```
