@@ -65,7 +65,7 @@ def main():
     log("")
     log(f"  MATERIAL FLOW & DEMAND COVERAGE:")
     log(f"    - Total Demanded Volume      : {result['total_units_demanded']:,.0f} units")
-    log(f"    - Total Finished Output Cut  : {result['total_units_produced']:,.0f} units (100% Demand Satisfaction, 0 Shortfall)")
+    log(f"    - Total Finished Output Produced  : {result['total_units_produced']:,.0f} units (100% Demand Satisfaction, 0 Shortfall)")
     log("=" * 115)
 
     log("\n[CONCLUSION] Successfully resolved multi-echelon bottleneck trade-offs,")
