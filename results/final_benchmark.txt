@@ -1,7 +1,7 @@
 ===================================================================================================================
 MULTI-ECHELON SUPPLY CHAIN NETWORK FLOW OPTIMIZATION PIPELINE
 Benchmark: Deterministic 3-Echelon Multi-Commodity Supply Chain Network Flow
-Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality via PuLP with CBC solver
+Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality via SciPy HiGHS
 ===================================================================================================================
 
 [1/3] Loading supply chain network topology and operational parameters...
@@ -11,7 +11,7 @@ Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality 
       • Materials & Finished Products     : 4 Materials & 4 Finished Goods
       • Total Weekly Customer Demand      : 7,500 units
 
-[2/3] Formulating and solving exact Linear Program (LP) in PuLP with CBC solver...
+[2/3] Formulating and solving exact Linear Program (LP) in SciPy HiGHS...
       -> Enforcing Supplier Inventory & Raw Material Allocation Limits
       -> Enforcing Bill of Materials (BOM) Component Conversion Balances
       -> Enforcing Plant Throughput Production Capacities
@@ -20,9 +20,9 @@ Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality 
 [3/3] Optimal Global Network Cost Breakdown & Operational Decisions:
 ===================================================================================================================
   OPTIMIZATION CONVERGENCE:
-    - Solver Engine              : PuLP with CBC solver
-    - Optimization Status        : Optimal (Proven Global Optimum — 0.0% Integrality Gap)
-    - Total Minimum Network Cost : $986,882.96 (~$986,883.00)
+    - Solver Engine              : SciPy HiGHS (Dual-Simplex / Interior-Point)
+    - Optimization Status        : Optimal_Converged (HiGHS) (Proven Global Optimum — 0.0% Integrality Gap)
+    - Total Minimum Network Cost : $986,882.95 (~$986,883.00)
 
   COST BREAKDOWN ACCROSS SUPPLY CHAIN TIERS:
     - Raw Material Procurement   : $839,235.23 (85.04% of total expenditure)
@@ -31,10 +31,10 @@ Solver Formulation: Pure Linear Program (LP) solved to Proven Global Optimality 
 
   MATERIAL FLOW & DEMAND COVERAGE:
     - Total Demanded Volume      : 7,500 units
-    - Total Finished Output Cut  : 7,500 units (100% Demand Satisfaction, 0 Shortfall)
+    - Total Finished Output Produced  : 7,500 units (100% Demand Satisfaction, 0 Shortfall)
 ===================================================================================================================
 
 [CONCLUSION] Successfully resolved multi-echelon bottleneck trade-offs,
-   achieving global cost minimization at $986,882.96 with 100% customer demand fulfillment.
+   achieving global cost minimization at $986,882.95 with 100% customer demand fulfillment.
 ===================================================================================================================
 
